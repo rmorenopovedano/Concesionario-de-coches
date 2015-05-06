@@ -1,12 +1,26 @@
 /**
  * Paquete concesionarioCoches
+ * Hay que hacerla serializable. Luego crear 2 clases static, un flujo de entrada y uno de salida. Fichero.escribir, fichero.leer
+ * Crear un main que escribas el concesionario en el sistema de ficheros y lo recuperas. Cuando tengamos esto hecho enseñarlo y luego ver qué pasa.
  */
 package pgn.examenMarzo.concesionarioCoches;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 /**
  * Clase ArrayList
  */
 import java.util.ArrayList;
+
+import pgn.examenMarzo.utiles.Teclado;
 
 /*
  * No pueden existir dos coches con la misma matrícula en el almacén del concesinario
@@ -14,12 +28,23 @@ import java.util.ArrayList;
  * Ninguno de los valores puede ser por defecto
  */
 /**
- * Clase concesionario donde van a gestionarse las acciones sobre los coches
+ * Crea otra versión de Concesionario de coches, ahora almacenará el
+ * concesionario completo en el sistema de ficheros, del que se podrá recuperar
+ * en cualquier momento Para ello: Añade una opción Ficheros al menú principal
+ * Crea un menú para gestionar los ficheros. Tendrá las opciones típicas: nuevo,
+ * abrir, guardar, guardar como... El concesionario podrá guardarse en un
+ * fichero (guardar y guardar como...) El concesionario podrá leerse de un
+ * fichero (abrir) Podrá crearse un concesionario nuevo (nuevo) En caso de que
+ * se pueda perder información del concesionario, se le preguntará al usuario
+ * (nuevo, abrir, guardar como...) Se le añadirá la extensión ".obj". Deberás
+ * utilizar la clase File, que es una representación abstracta de los nombres de
+ * los ficheros y directorios. Podrás usar los métodos: File file = new
+ * File(String pathname) file.getPath(); file.exists();
  * 
  * @author Ra&uacute;l Moreno Povedano
  * 
  */
-public class Concesionario {
+public class Concesionario implements Serializable {
 	/**
 	 * ArrayList que guarda los coches de un concesionario
 	 */
@@ -42,18 +67,19 @@ public class Concesionario {
 	 *         coche ya est&aacute; repetido en el concesionario, o sino
 	 *         devuelve el coche a&ntilde;adido al ArrayList.
 	 * @throws MatriculaNoValidaException
-	 * @throws ModeloNoValidoException 
-	 * @throws ColorNoValidoException 
-	 * @throws CocheYaExisteException 
+	 * @throws ModeloNoValidoException
+	 * @throws ColorNoValidoException
+	 * @throws CocheYaExisteException
 	 */
 
-	void annadir(String matricula, Color color, Modelo modelo) throws MatriculaNoValidaException, ColorNoValidoException, ModeloNoValidoException, CocheYaExisteException
-			 {
-	//	Coche coche = Coche.instanciarCoche(matricula, color, modelo);
-		Coche coche=new Coche(matricula, color, modelo);
+	void annadir(String matricula, Color color, Modelo modelo)
+			throws CocheYaExisteException, MatriculaNoValidaException,
+			ColorNoValidoException, ModeloNoValidoException {
+		// Coche coche = Coche.instanciarCoche(matricula, color, modelo);
+		Coche coche = new Coche(matricula, color, modelo);
 
 		if (coche == null || almacen.contains(coche))
-			 throw new CocheYaExisteException("El coche ya existe");
+			throw new CocheYaExisteException("El coche ya existe");
 		almacen.add(coche);
 	}
 
@@ -64,12 +90,12 @@ public class Concesionario {
 	 *            &iacute;cula del coche
 	 * @return el coche eliminado si es un coche v&aacute;lido, o false no
 	 *         est&aacute; instanciado correctamente.
-	 * @throws MatriculaNoValidaException 
+	 * @throws MatriculaNoValidaException
 	 */
 
 	boolean eliminar(String matricula) throws MatriculaNoValidaException {
-//		return almacen.remove(Coche.instanciarCoche(matricula));
-		Coche coche=new Coche(matricula);
+		// return almacen.remove(Coche.instanciarCoche(matricula));
+		Coche coche = new Coche(matricula);
 		return almacen.remove(coche);
 	}
 
@@ -134,4 +160,48 @@ public class Concesionario {
 		return arrCochesColor;
 	}
 
+	public void guardar(String nombreArchivo) throws IOException {
+
+		File file = new File(nombreArchivo);
+		try (ObjectOutputStream out = new ObjectOutputStream(
+				new BufferedOutputStream(new FileOutputStream(file)))) {
+			out.writeObject(almacen);
+		}
+
+	}
+
+	public void abrir() throws ClassNotFoundException, IOException {
+		String nombreArchivo = Teclado.leerCadena("Qué archivo quieres abrir?");
+		File file = new File(nombreArchivo);
+		try (ObjectInputStream in = new ObjectInputStream(
+				new BufferedInputStream(new FileInputStream(file)))) {
+			almacen = (ArrayList<Coche>) in.readObject();
+		}
+
+	}
+
+	public void guardarComo() throws FileNotFoundException, IOException,
+			FicheroExisteException {
+
+		String nombreArchivo = Teclado
+				.leerCadena("Guarda el archivo con el siguiente nombre: ");
+		File file = new File(nombreArchivo);
+		try (ObjectOutputStream out = new ObjectOutputStream(
+				new BufferedOutputStream(new FileOutputStream(file)))) {
+			if (file.exists())
+				throw new FicheroExisteException("El fichero ya existe");
+			else
+				out.writeObject(almacen);
+		}
+
+	}
+
+	public void nuevo() throws FileNotFoundException, IOException {
+		String nombreArchivo = Teclado.leerCadena("Nombre del archivo: ");
+		File file = new File(nombreArchivo);
+		try (ObjectOutputStream out = new ObjectOutputStream(
+				new BufferedOutputStream(new FileOutputStream(file)))) {
+			out.writeObject(almacen);
+		}
+	}
 }

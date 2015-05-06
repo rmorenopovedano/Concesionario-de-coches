@@ -2,9 +2,19 @@
  * Paquete concesionarioCoches
  */
 package pgn.examenMarzo.concesionarioCoches;
+
 /**
  * clase Men&uacute;
  */
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+
 import pgn.examenMarzo.utiles.Menu;
 /**
  * Clase Teclado
@@ -20,18 +30,32 @@ import pgn.examenMarzo.concesionarioCoches.Color;
 import pgn.examenMarzo.concesionarioCoches.Modelo;
 
 /**
- * Clase TestConcesionario donde vamos a comunicarnos con el usuario y probar nuestras clases.
+ * Crea otra versión de Concesionario de coches, ahora almacenará el
+ * concesionario completo en el sistema de ficheros, del que se podrá recuperar
+ * en cualquier momento Para ello: Añade una opción Ficheros al menú principal
+ * Crea un menú para gestionar los ficheros. Tendrá las opciones típicas: nuevo,
+ * abrir, guardar, guardar como... El concesionario podrá guardarse en un
+ * fichero (guardar y guardar como...) El concesionario podrá leerse de un
+ * fichero (abrir) Podrá crearse un concesionario nuevo (nuevo) En caso de que
+ * se pueda perder información del concesionario, se le preguntará al usuario
+ * (nuevo, abrir, guardar como...) Se le añadirá la extensión ".obj". Deberás
+ * utilizar la clase File, que es una representación abstracta de los nombres de
+ * los ficheros y directorios. Podrás usar los métodos: File file = new
+ * File(String pathname) file.getPath(); file.exists();
+ * 
  * @author Ra&uacute;l Moreno Povedano
  * 
  */
 public class TestConcesionario extends Concesionario {
+	static Menu menuFicheros = new Menu("**ARCHIVOS**", new String[] {
+			"Nuevo...", "Abrir...", "Guardar...", "Guardar como..." });
 	/**
 	 * Men&uacute; est&aacute;tico que muestra las opciones del men&uacute;
 	 */
 	static Menu menu = new Menu("Concesionario de coches", new String[] {
 			"Alta Coche", "Baja Coche", "Mostrar Coche",
 			"Mostrar concesionario", "Contar coches del concesionario",
-			"Mostrar coches de un color", "Salir" });
+			"Mostrar coches de un color", "Ficheros", "Salir" });
 	/**
 	 * Men&uacute; est&aacute;tico para elegir el color del coche
 	 */
@@ -46,8 +70,10 @@ public class TestConcesionario extends Concesionario {
 	 * Clase est&aacute;tica que crea un concesionario de coches
 	 */
 	static Concesionario concesionario = new Concesionario();
+
 	/**
 	 * M&eacute;todo main
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {
@@ -72,12 +98,73 @@ public class TestConcesionario extends Concesionario {
 			case 6:// Mostrar coches de un color
 				System.out.println(concesionario.getCochesColor(pedirColor()));
 				break;
-
+			case 7:// Menu ficheros
+				try {
+					realizarOpcion(menuFicheros.gestionar());
+				} catch (FileNotFoundException e) {
+					System.out.println(e.getMessage());
+				} catch (IOException e) {
+					System.out.println(e.getMessage());
+				}
+				break;
 			default:// Salir
 				System.out.println("Aaaaaaaaaaaaaaaaaaaaadios");
 				return;
 			}
 		} while (true);
+	}
+
+	private static void realizarOpcion(int opcion)
+			throws FileNotFoundException, IOException {
+		switch (opcion) {
+		case 1:// nuevo archivo
+			concesionario.nuevo();
+			break;
+		case 2: // abrir archivo
+			try {
+				concesionario.abrir();
+			} catch (ClassNotFoundException e1) {
+				System.out.println(e1.getMessage());
+			} catch (IOException e1) {
+				System.out.println(e1.getMessage());
+			}
+			break;
+		case 3: // guardar archivo
+			try {
+				concesionario.guardar("Con qué nombre guardas tu archivo?: ");
+			} catch (IOException e) {
+				System.out.println(e.getMessage());
+			}
+			break;
+		case 4: // guardar como...
+			try {
+				concesionario.guardarComo();
+			} catch (Exception e) {
+				System.out.println(e.getMessage());
+			} finally {
+				char caracter;
+				do {
+					caracter = Teclado
+							.leerCaracter("Desea sobreescribir?(s/n)");
+				} while (caracter != 's' && caracter != 'n');
+				if (caracter == 's')
+					try {
+						concesionario
+								.guardar("Con qué nombre guardas tu archivo?: ");
+					} catch (IOException e1) {
+						System.out.println(e1.getMessage());
+					}
+				else {
+					String fichero = Teclado.leerCadena("nombre del archivo: ");
+					try (ObjectOutputStream out = new ObjectOutputStream(
+							new FileOutputStream(fichero))) {
+						out.writeObject(concesionario);
+
+					}
+
+				}
+			}
+		}
 	}
 
 	/**
@@ -92,7 +179,7 @@ public class TestConcesionario extends Concesionario {
 		} catch (MatriculaNoValidaException | CocheNoExisteException e) {
 			System.out.println(e.getMessage());
 		}
-	
+
 	}
 
 	/**
@@ -100,8 +187,8 @@ public class TestConcesionario extends Concesionario {
 	 */
 	private static void eliminarCoche() {
 		try {
-			if (concesionario
-					.eliminar(Teclado.leerCadena("Introduce la matrícula")))
+			if (concesionario.eliminar(Teclado
+					.leerCadena("Introduce la matrícula")))
 				System.out.println("Coche eliminado");
 			else
 				System.out.println("No se ha podido eliminar");
@@ -112,29 +199,30 @@ public class TestConcesionario extends Concesionario {
 
 	/**
 	 * Metodo que a&ntilde;ade un coche al concesionario
-	 * @throws CocheYaExisteException 
-	 * @throws ModeloNoValidoException 
-	 * @throws ColorNoValidoException 
-	 * @throws MatriculaNoValidaException 
+	 * 
+	 * @throws CocheYaExisteException
+	 * @throws ModeloNoValidoException
+	 * @throws ColorNoValidoException
+	 * @throws MatriculaNoValidaException
 	 */
 	private static void annadirCoche() {
-		
-			try {
-				concesionario.annadir(Teclado.leerCadena("Introduce la matrícula"),
-						pedirColor(), pedirModelo());
-					System.out.println("Coche añadido con éxito");
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-				
-			}
-		
-		
-			
-		
+
+		try {
+			concesionario.annadir(Teclado.leerCadena("Introduce la matrícula"),
+					pedirColor(), pedirModelo());
+			System.out.println("Coche añadido con éxito");
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+
+		}
+
 	}
+
 	/**
 	 * M&eacute;todo para pedir el modelo del coche que buscamos
-	 * @return null si no existe ese modelo en el concesionario, o un array de Modelos que hayamos encontrado.
+	 * 
+	 * @return null si no existe ese modelo en el concesionario, o un array de
+	 *         Modelos que hayamos encontrado.
 	 */
 
 	private static Modelo pedirModelo() {
@@ -144,9 +232,12 @@ public class TestConcesionario extends Concesionario {
 			return null;
 		return arrModelos[opcion - 1];
 	}
+
 	/**
 	 * M&eacute;todo para pedir el color del coche que buscamos
-	 * @return null si no existe un coche de ese color en el concesionario, o un array de Colores que hayamos encontrado.
+	 * 
+	 * @return null si no existe un coche de ese color en el concesionario, o un
+	 *         array de Colores que hayamos encontrado.
 	 */
 
 	private static Color pedirColor() {
@@ -156,4 +247,5 @@ public class TestConcesionario extends Concesionario {
 			return null;
 		return arrColores[opcion - 1];
 	}
+
 }

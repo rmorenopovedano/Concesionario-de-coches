@@ -2,6 +2,7 @@
  * Paquete concesionarioCoches.
  */
 package pgn.examenMarzo.concesionarioCoches;
+import java.io.Serializable;
 /**
  * Clase Pattern.
  */
@@ -11,7 +12,7 @@ import java.util.regex.Pattern;
  * @author Ra&uacute;l Moreno Povedano
  *
  */
-public class Coche {
+public class Coche implements Serializable {
 	/**
 	 * String que define la matr&iacute;cula de un coche
 	 */
