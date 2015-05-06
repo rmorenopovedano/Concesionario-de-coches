@@ -45,6 +45,16 @@ import pgn.examenMarzo.utiles.Teclado;
  * 
  */
 public class Concesionario implements Serializable {
+	private boolean modificado;
+	public boolean isModificado() {
+		return modificado;
+	}
+
+	public void setModificado(boolean modificado) {
+		this.modificado = modificado;
+	}
+
+
 	/**
 	 * ArrayList que guarda los coches de un concesionario
 	 */
@@ -72,7 +82,7 @@ public class Concesionario implements Serializable {
 	 * @throws CocheYaExisteException
 	 */
 
-	void annadir(String matricula, Color color, Modelo modelo)
+	public void annadir(String matricula, Color color, Modelo modelo)
 			throws CocheYaExisteException, MatriculaNoValidaException,
 			ColorNoValidoException, ModeloNoValidoException {
 		// Coche coche = Coche.instanciarCoche(matricula, color, modelo);
@@ -81,6 +91,7 @@ public class Concesionario implements Serializable {
 		if (coche == null || almacen.contains(coche))
 			throw new CocheYaExisteException("El coche ya existe");
 		almacen.add(coche);
+		
 	}
 
 	/**
@@ -93,7 +104,7 @@ public class Concesionario implements Serializable {
 	 * @throws MatriculaNoValidaException
 	 */
 
-	boolean eliminar(String matricula) throws MatriculaNoValidaException {
+	public boolean eliminar(String matricula) throws MatriculaNoValidaException {
 		// return almacen.remove(Coche.instanciarCoche(matricula));
 		Coche coche = new Coche(matricula);
 		return almacen.remove(coche);
@@ -105,7 +116,7 @@ public class Concesionario implements Serializable {
 	 * @return el n&uacute;mero de elementos del ArrayList.
 	 */
 
-	int size() {
+	public int size() {
 		return almacen.size();
 	}
 
@@ -121,7 +132,7 @@ public class Concesionario implements Serializable {
 	 * @throws CocheNoExisteException
 	 *             Si el coche no está en el concesionario.
 	 */
-	Coche get(String matricula) throws MatriculaNoValidaException,
+	public Coche get(String matricula) throws MatriculaNoValidaException,
 			CocheNoExisteException {
 		// Coche coche = Coche.instanciarCoche(matricula);
 		Coche coche = new Coche(matricula);
@@ -159,49 +170,69 @@ public class Concesionario implements Serializable {
 		}
 		return arrCochesColor;
 	}
-
-	public void guardar(String nombreArchivo) throws IOException {
-
-		File file = new File(nombreArchivo);
-		try (ObjectOutputStream out = new ObjectOutputStream(
-				new BufferedOutputStream(new FileOutputStream(file)))) {
-			out.writeObject(almacen);
+	public String establecerCoche(String matricula) {
+		ArrayList<Coche>arraylist=new ArrayList<Coche>();
+		for (Coche coche : arraylist) {
+			if (arraylist.contains(matricula))
+					return coche.toString();
 		}
-
+		return null;
+		
+		
+		
+	}
+	
+	
+	public Coche get(int index) {
+		if(almacen.isEmpty())
+			return null;
+		if(index < 0 | index > almacen.size()-1)
+			return null;
+		return almacen.get(index);
 	}
 
-	public void abrir() throws ClassNotFoundException, IOException {
-		String nombreArchivo = Teclado.leerCadena("Qué archivo quieres abrir?");
-		File file = new File(nombreArchivo);
-		try (ObjectInputStream in = new ObjectInputStream(
-				new BufferedInputStream(new FileInputStream(file)))) {
-			almacen = (ArrayList<Coche>) in.readObject();
-		}
+//	public void guardar(String nombreArchivo) throws IOException {
+//
+//		File file = new File(nombreArchivo);
+//		try (ObjectOutputStream out = new ObjectOutputStream(
+//				new BufferedOutputStream(new FileOutputStream(file)))) {
+//			out.writeObject(almacen);
+//		}
+//
+//	}
 
-	}
+//	public void abrir() throws ClassNotFoundException, IOException {
+//		String nombreArchivo = Teclado.leerCadena("Qué archivo quieres abrir?");
+//		File file = new File(nombreArchivo);
+//		try (ObjectInputStream in = new ObjectInputStream(
+//				new BufferedInputStream(new FileInputStream(file)))) {
+//			almacen = (ArrayList<Coche>) in.readObject();
+//		}
+//
+//	}
 
-	public void guardarComo() throws FileNotFoundException, IOException,
-			FicheroExisteException {
+//	public void guardarComo() throws FileNotFoundException, IOException,
+//			FicheroExisteException {
+//
+//		String nombreArchivo = Teclado
+//				.leerCadena("Guarda el archivo con el siguiente nombre: ");
+//		File file = new File(nombreArchivo);
+//		try (ObjectOutputStream out = new ObjectOutputStream(
+//				new BufferedOutputStream(new FileOutputStream(file)))) {
+//			if (file.exists())
+//				throw new FicheroExisteException("El fichero ya existe");
+//			else
+//				out.writeObject(almacen);
+//		}
+//
+//	}
 
-		String nombreArchivo = Teclado
-				.leerCadena("Guarda el archivo con el siguiente nombre: ");
-		File file = new File(nombreArchivo);
-		try (ObjectOutputStream out = new ObjectOutputStream(
-				new BufferedOutputStream(new FileOutputStream(file)))) {
-			if (file.exists())
-				throw new FicheroExisteException("El fichero ya existe");
-			else
-				out.writeObject(almacen);
-		}
-
-	}
-
-	public void nuevo() throws FileNotFoundException, IOException {
-		String nombreArchivo = Teclado.leerCadena("Nombre del archivo: ");
-		File file = new File(nombreArchivo);
-		try (ObjectOutputStream out = new ObjectOutputStream(
-				new BufferedOutputStream(new FileOutputStream(file)))) {
-			out.writeObject(almacen);
-		}
-	}
+//	public void nuevo() throws FileNotFoundException, IOException {
+//		String nombreArchivo = Teclado.leerCadena("Nombre del archivo: ");
+//		File file = new File(nombreArchivo);
+//		try (ObjectOutputStream out = new ObjectOutputStream(
+//				new BufferedOutputStream(new FileOutputStream(file)))) {
+//			out.writeObject(almacen);
+//		}
+//	}
 }

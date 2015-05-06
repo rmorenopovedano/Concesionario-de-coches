@@ -2,13 +2,16 @@
  * Paquete concesionarioCoches.
  */
 package pgn.examenMarzo.concesionarioCoches;
+
 import java.io.Serializable;
 /**
  * Clase Pattern.
  */
 import java.util.regex.Pattern;
+
 /**
  * Clase coche que define los m&eacute;todos y atributos de un objeto coche.
+ * 
  * @author Ra&uacute;l Moreno Povedano
  *
  */
@@ -26,107 +29,154 @@ public class Coche implements Serializable {
 	 */
 	private Modelo modelo;
 	/**
-	 * Atributo final de la clase Pattern que define una expresi&oacute;n regular para que una matr&iacute;cula sea v&aacute;lida.
+	 * Atributo final de la clase Pattern que define una expresi&oacute;n
+	 * regular para que una matr&iacute;cula sea v&aacute;lida.
 	 */
 	static final private Pattern patternMatricula = Pattern
 			.compile("^\\d{4}[ -]?[[B-Z]&&[^QEIOU]]{3}$");
+
 	/**
-	 * Constructor de la clase Coche para generar un coche con 3 par&aacute;metros.
-	 * @param matr&iacute;cula que le pasamos al constructor
-	 * @param color que le pasamos al constructor
-	 * @param modelo que le pasamos al constructor
-	 * @throws MatriculaNoValidaException 
-	 * @throws ColorNoValidoException 
-	 * @throws ModeloNoValidoException 
+	 * Constructor de la clase Coche para generar un coche con 3
+	 * par&aacute;metros.
+	 * 
+	 * @param matr
+	 *            &iacute;cula que le pasamos al constructor
+	 * @param color
+	 *            que le pasamos al constructor
+	 * @param modelo
+	 *            que le pasamos al constructor
+	 * @throws MatriculaNoValidaException
+	 * @throws ColorNoValidoException
+	 * @throws ModeloNoValidoException
 	 */
 
-	 Coche(String matricula, Color color, Modelo modelo) throws MatriculaNoValidaException, ColorNoValidoException, ModeloNoValidoException {
+	Coche(String matricula, Color color, Modelo modelo)
+			throws MatriculaNoValidaException, ColorNoValidoException,
+			ModeloNoValidoException {
 		super();
 		setMatricula(matricula);
 		setColor(color);
 		setModelo(modelo);
 	}
+
 	/**
-	 * Constructor de la clase Coche para generar un coche con un solo par&aacute;metro
-	 * @param matr&iacute;cula que le pasamos al constructor
-	 * @throws MatriculaNoValidaException 
+	 * Constructor de la clase Coche para generar un coche con un solo
+	 * par&aacute;metro
+	 * 
+	 * @param matr
+	 *            &iacute;cula que le pasamos al constructor
+	 * @throws MatriculaNoValidaException
 	 */
 
-	Coche(String matricula) throws MatriculaNoValidaException {
+	public Coche(String matricula) throws MatriculaNoValidaException {
 		setMatricula(matricula);
 	}
+
 	/**
-	 * M&eacute;todo que instancia un coche v&aacute;lido 
-	 * @param matr&iacute;cula que queremos validar
-	 * @param color que queremos instanciar
-	 * @param modelo que queremos instanciar
-	 * @return un Coche nuevo en caso de ser un coche v&aacute;lido, o null en caso de no poder validarse.
+	 * M&eacute;todo que instancia un coche v&aacute;lido
+	 * 
+	 * @param matr
+	 *            &iacute;cula que queremos validar
+	 * @param color
+	 *            que queremos instanciar
+	 * @param modelo
+	 *            que queremos instanciar
+	 * @return un Coche nuevo en caso de ser un coche v&aacute;lido, o null en
+	 *         caso de no poder validarse.
 	 */
 
-//	static Coche instanciarCoche(String matricula, Color color, Modelo modelo) {
-//		if (esValida(matricula) && color != null && modelo != null)
-//			return new Coche(matricula, color, modelo);
-//		return null;
-//	}
-//	/**
-//	 * Método que instancia un coche v&aacute;lido.
-//	 * @param matr&iacute;cula que queremos validar.
-//	 * @return un Coche nuevo en caso de ser un coche v&aacute;lido, o null en caso de no poder validarse.
-//	 */
-//
-//	static Coche instanciarCoche(String matricula) {
-//		if (esValida(matricula))
-//			return new Coche(matricula);
-//		return null;
-//	}
+	// static Coche instanciarCoche(String matricula, Color color, Modelo
+	// modelo) {
+	// if (esValida(matricula) && color != null && modelo != null)
+	// return new Coche(matricula, color, modelo);
+	// return null;
+	// }
+	// /**
+	// * Método que instancia un coche v&aacute;lido.
+	// * @param matr&iacute;cula que queremos validar.
+	// * @return un Coche nuevo en caso de ser un coche v&aacute;lido, o null en
+	// caso de no poder validarse.
+	// */
+	//
+	// static Coche instanciarCoche(String matricula) {
+	// if (esValida(matricula))
+	// return new Coche(matricula);
+	// return null;
+	// }
 	/**
 	 * Método que valida la m&aacute;tricula de un coche.
-	 * @param matr&iacute;cula que queremos validar
-	 * @return Patrón validado si es true, o false si no es v&aacute;lido el patr&oacute;n.
+	 * 
+	 * @param matr
+	 *            &iacute;cula que queremos validar
+	 * @return Patrón validado si es true, o false si no es v&aacute;lido el
+	 *         patr&oacute;n.
 	 */
 
 	private static boolean esValida(String matricula) {
 		return patternMatricula.matcher(matricula).matches();
 	}
+
+	public Modelo getModelo() {
+		return modelo;
+	}
+
 	/**
 	 * M&eacute;todo set del campo matr&iacute;cula
-	 * @param matr&iacute;cula del coche.
-	 * @throws MatriculaNoValidaException 
+	 * 
+	 * @param matr
+	 *            &iacute;cula del coche.
+	 * @throws MatriculaNoValidaException
 	 */
-	private void setMatricula(String matricula) throws MatriculaNoValidaException {
-		if(esValida(matricula))
-				this.matricula = matricula;
-		else throw new MatriculaNoValidaException("Matrícula no válida");
+	private void setMatricula(String matricula)
+			throws MatriculaNoValidaException {
+		if (esValida(matricula))
+			this.matricula = matricula;
+		else
+			throw new MatriculaNoValidaException("Matrícula no válida");
 	}
+
 	/**
 	 * M&eacute;todo que obtiene el color de un coche.
+	 * 
 	 * @return el color del coche.
 	 */
 
-	Color getColor() {
+	public Color getColor() {
 		return color;
 	}
+
+	public String getMatricula() {
+		return matricula;
+	}
+
 	/**
 	 * M&eacute;todo set del campo color
-	 * @param color del coche.
-	 * @throws ColorNoValidoException 
+	 * 
+	 * @param color
+	 *            del coche.
+	 * @throws ColorNoValidoException
 	 */
 
 	private void setColor(Color color) throws ColorNoValidoException {
-		if(color!=null)
+		if (color != null)
 			this.color = color;
-		else throw new ColorNoValidoException("Color no válido");
+		else
+			throw new ColorNoValidoException("Color no válido");
 	}
+
 	/**
 	 * M&eacute;todo set del campo modelo
-	 * @param modelo del coche.
-	 * @throws ModeloNoValidoException 
+	 * 
+	 * @param modelo
+	 *            del coche.
+	 * @throws ModeloNoValidoException
 	 */
 
 	private void setModelo(Modelo modelo) throws ModeloNoValidoException {
-		if(modelo!=null)
+		if (modelo != null)
 			this.modelo = modelo;
-		else throw new ModeloNoValidoException("Modelo no válido");
+		else
+			throw new ModeloNoValidoException("Modelo no válido");
 	}
 
 	/*
@@ -172,8 +222,8 @@ public class Coche implements Serializable {
 	 */
 	@Override
 	public String toString() {
-		return "\nCoche [matricula=" + matricula + ", color=" + color
-				+ ", modelo=" + modelo + "]";
+		return "\nMatrícula: " + matricula + "\nColor: " + color + "\nModelo: "
+				+ modelo + "\nMarca: " + modelo.getMarca();
 	}
 
 }

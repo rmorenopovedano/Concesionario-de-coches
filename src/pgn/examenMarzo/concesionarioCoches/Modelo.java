@@ -2,6 +2,9 @@
  * Paquete concesionarioCoches
  */
 package pgn.examenMarzo.concesionarioCoches;
+
+import java.util.ArrayList;
+
 /**
  * Clase que contiene modelos de coches predefinidos.
  * @author Ra&uacute;l Moreno Povedano
@@ -60,7 +63,7 @@ public enum Modelo {
 	 * M&eacute;todo toString
 	 */
 	public String toString() {
-		return name() + ", " + getMarca();
+		return name();
 
 	}
 
@@ -87,6 +90,15 @@ public enum Modelo {
 
 	public static Modelo[] getValues() {
 		return VALUES;
+	}
+	
+	public static ArrayList<Modelo> getModelosMarca(Marca marca) {
+		ArrayList<Modelo> arraylist=new ArrayList<Modelo>();
+		for (Modelo modelo : Modelo.values()) {
+			if(marca==modelo.getMarca())
+				arraylist.add(modelo);
+		}
+		return arraylist;
 	}
 	// -------------------------------------------------
 

@@ -26,7 +26,7 @@ public enum Color {
 /**
  * Array de los valores de la enumeraci&oacute;n color
  */
-	private static final Color[] VALUES = Color.values();
+	public static final Color[] VALUES = Color.values();
 /**
  * M&eacute;todo est&aacute;tico que genera las opciones de un Men&uacute;.
  * @return Array de cadenas con las opciones del men&uacute;.
