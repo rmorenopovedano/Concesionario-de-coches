@@ -19,25 +19,19 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JList;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-import javax.swing.border.TitledBorder;
-import javax.swing.border.EtchedBorder;
 
-import java.awt.Color;
-
-import javax.swing.AbstractListModel;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-
+import pgn.examenMarzo.concesionarioCoches.CocheNoExisteException;
 import pgn.examenMarzo.concesionarioCoches.Concesionario;
 import pgn.examenMarzo.concesionarioCoches.MatriculaNoValidaException;
 
 public class Baja extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField campoMatricula;
-	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private Concesionario concesionario;
 
 	/**
@@ -49,6 +43,7 @@ public class Baja extends JDialog {
 	 */
 	public Baja(Concesionario concesionario2, JFrame frame) {
 		super(frame);
+		setResizable(false);
 		concesionario = concesionario2;
 		setTitle("Baja");
 		setModal(true);
@@ -67,11 +62,15 @@ public class Baja extends JDialog {
 		}
 
 		campoMatricula = new JTextField();
+		campoMatricula.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		campoMatricula.setBounds(169, 47, 120, 20);
 		contentPanel.add(campoMatricula);
 		campoMatricula.setColumns(10);
 
-		JList list = new JList();
+		JList<Object> list = new JList<Object>();
 		list.setBounds(84, 119, 1, 1);
 		contentPanel.add(list);
 		{
@@ -83,25 +82,42 @@ public class Baja extends JDialog {
 				eliminarButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent arg0) {
 						try {
+							if (concesionario.get(campoMatricula.getText()) == null) {
+							} else {
+								int entero = JOptionPane.showConfirmDialog(
+										null,
+										"Estás seguro que desea eliminar?",
+										"Eliminar",
+										JOptionPane.YES_NO_CANCEL_OPTION,
+										JOptionPane.QUESTION_MESSAGE);
 
-							if (concesionario.eliminar(campoMatricula.getText())) {
-								JOptionPane.showMessageDialog(null,
-										"Coche eliminado con éxito",
-										"Eliminar coche",
-										JOptionPane.INFORMATION_MESSAGE);
-								concesionario.setModificado(true);
+								switch (entero) {
+								case JOptionPane.YES_OPTION:
+									concesionario.eliminar(campoMatricula
+											.getText());
+									JOptionPane.showMessageDialog(null,
+											"Coche eliminado con éxito",
+											"Eliminar coche",
+											JOptionPane.INFORMATION_MESSAGE);
+									concesionario.setModificado(true);
+									campoMatricula.setText(null);
+									return;
+									
+								}
 							}
 
-							else
-								JOptionPane.showMessageDialog(null,
-										"Coche no existe", "Error",
-										JOptionPane.ERROR_MESSAGE);
 						} catch (MatriculaNoValidaException e) {
 							JOptionPane.showMessageDialog(getParent(),
 									e.getMessage(), "Error",
 									JOptionPane.ERROR_MESSAGE);
 
+						} catch (CocheNoExisteException e) {
+							JOptionPane.showMessageDialog(null,
+									"El coche no existe", "Error",
+									JOptionPane.ERROR_MESSAGE);
 						}
+					
+
 					}
 				});
 				eliminarButton.setActionCommand("OK");
@@ -109,15 +125,15 @@ public class Baja extends JDialog {
 				getRootPane().setDefaultButton(eliminarButton);
 			}
 			{
-				JButton CANCELAR = new JButton("CANCELAR");
-				CANCELAR.addActionListener(new ActionListener() {
+				JButton cancelarButton = new JButton("CANCELAR");
+				cancelarButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setVisible(false);
 
 					}
 				});
-				CANCELAR.setActionCommand("Cancel");
-				buttonPane.add(CANCELAR);
+				cancelarButton.setActionCommand("Cancel");
+				buttonPane.add(cancelarButton);
 			}
 		}
 	}

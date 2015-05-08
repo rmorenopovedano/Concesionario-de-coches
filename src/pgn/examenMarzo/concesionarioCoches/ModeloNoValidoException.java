@@ -2,6 +2,11 @@ package pgn.examenMarzo.concesionarioCoches;
 
 public class ModeloNoValidoException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public ModeloNoValidoException() {
 		// TODO Auto-generated constructor stub
 	}

@@ -17,6 +17,10 @@ import java.util.regex.Pattern;
  */
 public class Coche implements Serializable {
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	/**
 	 * String que define la matr&iacute;cula de un coche
 	 */
 	private String matricula;
@@ -112,7 +116,7 @@ public class Coche implements Serializable {
 	 *         patr&oacute;n.
 	 */
 
-	private static boolean esValida(String matricula) {
+	public static boolean esValida(String matricula) {
 		return patternMatricula.matcher(matricula).matches();
 	}
 

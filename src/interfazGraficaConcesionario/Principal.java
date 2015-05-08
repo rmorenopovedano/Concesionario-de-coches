@@ -1,6 +1,5 @@
 package interfazGraficaConcesionario;
 
-import java.awt.Dialog;
 import java.awt.EventQueue;
 
 import javax.swing.JFileChooser;
@@ -12,15 +11,8 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import pgn.examenMarzo.concesionarioCoches.Coche;
-import pgn.examenMarzo.concesionarioCoches.CocheYaExisteException;
-import pgn.examenMarzo.concesionarioCoches.Color;
-import pgn.examenMarzo.concesionarioCoches.ColorNoValidoException;
 import pgn.examenMarzo.concesionarioCoches.Concesionario;
 import pgn.examenMarzo.concesionarioCoches.Fichero;
-import pgn.examenMarzo.concesionarioCoches.MatriculaNoValidaException;
-import pgn.examenMarzo.concesionarioCoches.ModeloNoValidoException;
-import pgn.examenMarzo.utiles.Menu;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.InputEvent;
@@ -28,9 +20,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+
+import javax.swing.JSeparator;
+
+import java.awt.Toolkit;
 
 /**
  * Concesionario de coches con GUI
@@ -74,7 +69,7 @@ public class Principal {
 	private AboutConcesionario dialogoAboutConcesionario;
 	private Ayuda dialogoAyuda;
 	static MostrarPorColor dialogoMostrarPorColor;
-	private String rutaFichero;
+	private File fichero;
 	private JFileChooser filechooser;
 	/**
 	 * Clase est&aacute;tica que crea un concesionario de coches
@@ -110,10 +105,12 @@ public class Principal {
 	 */
 	private void initialize() {
 		frame = new JFrame();
+		frame.setIconImage(Toolkit.getDefaultToolkit().getImage(Principal.class.getResource("/img/rayoMc.png")));
+		frame.setResizable(false);
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent arg0) {
-				if(comprobarCambios())
+				if (comprobarCambios())
 					System.exit(0);
 			}
 		});
@@ -132,12 +129,12 @@ public class Principal {
 		JMenuItem Nuevo = new JMenuItem("Nuevo");
 		Nuevo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(comprobarCambios()){
-					frame.setTitle("Sin título - Concesionario");
-					rutaFichero = null;
+				if (comprobarCambios()) {
+					frame.setTitle("Sin título - Concesionario");	
+					fichero = null;
 					concesionario = new Concesionario();
 				}
-				
+
 			}
 		});
 		Nuevo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,
@@ -147,9 +144,9 @@ public class Principal {
 		JMenuItem Abrir = new JMenuItem("Abrir...");
 		Abrir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(comprobarCambios())
-				abrir();
-				
+				if (comprobarCambios())
+					abrir();
+
 			}
 		});
 		Abrir.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_A,
@@ -175,14 +172,18 @@ public class Principal {
 
 		});
 		mnFicheros.add(GuardarComo);
-		
+
 		JMenuItem mntmSalir = new JMenuItem("Salir");
+		mntmSalir.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
 		mntmSalir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				if(comprobarCambios())
+				if (comprobarCambios())
 					System.exit(0);
 			}
 		});
+
+		JSeparator separator = new JSeparator();
+		mnFicheros.add(separator);
 		mnFicheros.add(mntmSalir);
 
 		JMenu Coches = new JMenu("Coches");
@@ -203,8 +204,16 @@ public class Principal {
 		JMenuItem baja = new JMenuItem("Baja");
 		baja.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				dialogoBaja = new Baja(concesionario, frame);
-				dialogoBaja.setVisible(true);
+				if(concesionario.isEmpty())
+					JOptionPane.showMessageDialog(
+							null,
+							"No hay coches en el concesionario", "Mostrar",
+							JOptionPane.INFORMATION_MESSAGE);
+				else{
+					dialogoBaja = new Baja(concesionario, frame);
+					dialogoBaja.setVisible(true);
+				}
+				
 			}
 		});
 		baja.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_B,
@@ -212,43 +221,86 @@ public class Principal {
 		Coches.add(baja);
 
 		mostrarConcesionario = new JMenuItem("Mostrar concesionario");
+		mostrarConcesionario.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, InputEvent.ALT_MASK));
 		mostrarConcesionario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				dialogoMostrarConcesionario = new MostrarConcesionario(
-						concesionario, frame);
-				dialogoMostrarConcesionario.setVisible(true);
+				if(concesionario.isEmpty())
+					JOptionPane.showMessageDialog(
+							null,
+							"No hay coches en el concesionario", "Mostrar",
+							JOptionPane.INFORMATION_MESSAGE);
+				else{
+					dialogoMostrarConcesionario = new MostrarConcesionario(
+							concesionario, frame);
+					dialogoMostrarConcesionario.setVisible(true);
+				}
+			
 
 			}
 		});
+
+		JSeparator separator_1 = new JSeparator();
+		Coches.add(separator_1);
 		Coches.add(mostrarConcesionario);
 
 		JMenuItem mntmBuscarCoche = new JMenuItem("Buscar coche por Matricula");
 		mntmBuscarCoche.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dialogoMostrarCoche = new MostrarCoche(concesionario, frame);
+				if(concesionario.isEmpty())
+					JOptionPane.showMessageDialog(
+							null,
+							"No hay coches en el concesionario", "Mostrar",
+							JOptionPane.INFORMATION_MESSAGE);
+				else{
+					dialogoMostrarCoche = new MostrarCoche(concesionario, frame);
 				dialogoMostrarCoche.setVisible(true);
+				}
+				
 			}
 		});
-		mntmBuscarCoche.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M, InputEvent.ALT_MASK));
+
+		JSeparator separator_2 = new JSeparator();
+		Coches.add(separator_2);
+		mntmBuscarCoche.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_M,
+				InputEvent.ALT_MASK));
 		Coches.add(mntmBuscarCoche);
-		
+
 		JMenuItem mntmBuscarCochePor = new JMenuItem("Buscar coche por Color");
 		mntmBuscarCochePor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				dialogoMostrarPorColor= new MostrarPorColor(concesionario, frame);
+				if(concesionario.isEmpty())
+					JOptionPane.showMessageDialog(
+							null,
+							"No hay coches en el concesionario", "Mostrar",
+							JOptionPane.INFORMATION_MESSAGE);
+				else{
+					dialogoMostrarPorColor = new MostrarPorColor(concesionario,
+						frame);
 				dialogoMostrarPorColor.setVisible(true);
+				}
+				
 			}
 		});
-		mntmBuscarCochePor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, InputEvent.ALT_MASK));
+		mntmBuscarCochePor.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
+				InputEvent.ALT_MASK));
 		Coches.add(mntmBuscarCochePor);
-		
-		JMenuItem mntmContarCochesConcesionario = new JMenuItem("Contar coches concesionario");
+
+		JMenuItem mntmContarCochesConcesionario = new JMenuItem(
+				"Contar coches concesionario");
 		mntmContarCochesConcesionario.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JOptionPane.showMessageDialog(null, "Total de coches en el concesionario: "+concesionario.size() , "Añadir", JOptionPane.INFORMATION_MESSAGE);
+				JOptionPane.showMessageDialog(
+						null,
+						"Total de coches en el concesionario: "
+								+ concesionario.size(), "Añadir",
+						JOptionPane.INFORMATION_MESSAGE);
 			}
 		});
-		mntmContarCochesConcesionario.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.ALT_MASK));
+
+		JSeparator separator_3 = new JSeparator();
+		Coches.add(separator_3);
+		mntmContarCochesConcesionario.setAccelerator(KeyStroke.getKeyStroke(
+				KeyEvent.VK_N, InputEvent.ALT_MASK));
 		Coches.add(mntmContarCochesConcesionario);
 
 		JMenu Ayuda = new JMenu("Ayuda");
@@ -272,23 +324,18 @@ public class Principal {
 			}
 		});
 		Ayuda.add(mntmAboutConcesionario);
-	}
-
-
-
-	private Color elegirColor() {
-		
-		return null;
+		filechooser = new JFileChooser();
+		filechooser.setFileFilter(new FileNameExtensionFilter("archivos .obj",
+				"obj"));
 	}
 
 	protected void abrir() {
-		crearFileChooser();
 		int entero = filechooser.showOpenDialog(frame);
 		if (entero == JFileChooser.APPROVE_OPTION)
 			try {
-				concesionario = Fichero.abrir(filechooser.getSelectedFile());
-				rutaFichero=filechooser.getSelectedFile().getAbsolutePath();
-				frame.setTitle(rutaFichero+ " - Concesionario");
+				concesionario = (Concesionario) Fichero.abrir(filechooser.getSelectedFile());
+				fichero = filechooser.getSelectedFile();
+				frame.setTitle(fichero + "- Concesionario");
 			} catch (ClassNotFoundException | IOException e) {
 				JOptionPane.showMessageDialog(frame,
 						"No se ha podido abrir el archivo", "Abrir",
@@ -315,17 +362,12 @@ public class Principal {
 		return true;
 
 	}
-
-	private static boolean existe(String nombreFichero) {
-		File file = new File(nombreFichero);
-		return file.exists();
-	}
-
 	private boolean almacenar() {
 		try {
 			Fichero.guardar(filechooser.getSelectedFile(), concesionario);
-			rutaFichero = filechooser.getSelectedFile().getAbsolutePath();
-			frame.setTitle(rutaFichero + " - Concesionario");
+			fichero = filechooser.getSelectedFile();
+			Fichero.annadirExtension(fichero);
+			frame.setTitle(fichero + " - Concesionario");
 			concesionario.setModificado(false);
 			return true;
 		} catch (IOException e1) {
@@ -336,21 +378,23 @@ public class Principal {
 	}
 
 	private boolean guardarComo() {
-		crearFileChooser();
 		int opcion = filechooser.showSaveDialog(frame);
 		if (opcion == JFileChooser.APPROVE_OPTION)
 			if (sobreescribir(filechooser.getSelectedFile()))
 				return almacenar();
+
 		return false;
 	}
 
 	private boolean comprobarCambios() {
 		int entero;
 		if (concesionario.isModificado()) {
-			entero = JOptionPane.showConfirmDialog(frame,
-					"Los cambios guardados se perderán. Desea guardar los cambios?", "Cambios",
-					JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE);
+			entero = JOptionPane
+					.showConfirmDialog(
+							frame,
+							"Los cambios guardados se perderán. Desea guardar los cambios?",
+							"Cambios", JOptionPane.YES_NO_CANCEL_OPTION,
+							JOptionPane.QUESTION_MESSAGE);
 			switch (entero) {
 			case JOptionPane.YES_OPTION:
 				return guardar();
@@ -367,14 +411,11 @@ public class Principal {
 	}
 
 	private boolean guardar() {
-		if (rutaFichero != null)
+		if (fichero != null)
 			return almacenar();
 		else
 			return guardarComo();
 	}
-	private void crearFileChooser(){
-		filechooser=new JFileChooser();
-		filechooser.setFileFilter(new FileNameExtensionFilter("archivos .obj", "obj"));
-	}
+	
 
 }

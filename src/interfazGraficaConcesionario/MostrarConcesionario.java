@@ -26,36 +26,37 @@ import javax.swing.border.EtchedBorder;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import javax.swing.AbstractListModel;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
 import pgn.examenMarzo.concesionarioCoches.Coche;
-import pgn.examenMarzo.concesionarioCoches.CocheYaExisteException;
-import pgn.examenMarzo.concesionarioCoches.ColorNoValidoException;
 import pgn.examenMarzo.concesionarioCoches.Concesionario;
 import pgn.examenMarzo.concesionarioCoches.Marca;
-import pgn.examenMarzo.concesionarioCoches.MatriculaNoValidaException;
 import pgn.examenMarzo.concesionarioCoches.Modelo;
-import pgn.examenMarzo.concesionarioCoches.ModeloNoValidoException;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class MostrarConcesionario extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField text_matricula;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JRadioButton plataButton;
 	private JRadioButton rojoButton;
 	private JRadioButton azulButton;
-	private JList listaModelo;
+	private JList<Modelo> listaModelo;
 	private JList listaMarca;
 	private Concesionario concesionario;
 	private int indiceCoche = -1;
 	private JButton buttonSiguiente;
 	private JButton buttonAnterior;
-	private JButton mostrar;
+
 	
 
 	/**
@@ -67,8 +68,10 @@ public class MostrarConcesionario extends JDialog {
 	 * 
 	 * @param frame
 	 */
+	@SuppressWarnings("unchecked")
 	public MostrarConcesionario(Concesionario concesionario2, JFrame frame) {
 		super(frame);
+		setResizable(false);
 		concesionario = concesionario2;
 		setTitle("Mostrar Concesionario");
 		setModal(true);
@@ -87,6 +90,7 @@ public class MostrarConcesionario extends JDialog {
 		}
 
 		text_matricula = new JTextField();
+	
 		text_matricula.setEditable(false);
 		text_matricula.setEnabled(false);
 		text_matricula.setBounds(114, 18, 120, 20);
@@ -114,7 +118,11 @@ public class MostrarConcesionario extends JDialog {
 				establecerModelos();
 			}
 		});
-		listaMarca.setModel(new AbstractListModel() {
+		listaMarca.setModel(new AbstractListModel<Object>() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
 			Marca[] values = Marca.values();
 
 			public int getSize() {
@@ -169,8 +177,8 @@ public class MostrarConcesionario extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 
 			{
-				JButton CANCELAR = new JButton("CANCELAR");
-				CANCELAR.addActionListener(new ActionListener() {
+				JButton volverButton = new JButton("VOLVER");
+				volverButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setVisible(false);
 						if(Principal.dialogoMostrarPorColor!=null)
@@ -179,7 +187,7 @@ public class MostrarConcesionario extends JDialog {
 				});
 
 				buttonAnterior = new JButton("<ANTERIOR");
-				buttonAnterior.setVisible(false);
+				buttonAnterior.setVisible(true);
 				buttonAnterior.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						mostrarAnterior();
@@ -189,37 +197,43 @@ public class MostrarConcesionario extends JDialog {
 				buttonPane.add(buttonAnterior);
 
 				buttonSiguiente = new JButton("SIGUIENTE>");
-				buttonSiguiente.setVisible(false);
+				buttonSiguiente.setVisible(true);
 				buttonSiguiente.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						mostrarSiguiente();
 					}
 				});
 				actualizar();
-
-				mostrar = new JButton("MOSTRAR");
-				mostrar.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						if (concesionario.size() == 0)
-							JOptionPane.showMessageDialog(contentPanel,
-									"El concesionario esta vacio", "Error",
-									JOptionPane.ERROR_MESSAGE);
-						if (concesionario.get(0) != null) {
-							buttonAnterior.setVisible(true);
-							buttonSiguiente.setVisible(true);
-							mostrar.setVisible(false);
-
-						}
-					}
-				});
-				buttonPane.add(mostrar);
 				buttonPane.add(buttonSiguiente);
-				CANCELAR.setActionCommand("Cancel");
-				buttonPane.add(CANCELAR);
+				volverButton.setActionCommand("Cancel");
+				buttonPane.add(volverButton);
 			}
 		}
+		comprobarTamaño();
+		empezar();
 	}
 
+	private void comprobarTamaño() {
+		if(concesionario.size()==0){
+			buttonSiguiente.setVisible(false);
+			buttonAnterior.setVisible(false);
+		}
+		else if(concesionario.size()==1){
+			buttonSiguiente.setVisible(false);
+			buttonAnterior.setVisible(false);
+			
+		}else{
+			buttonSiguiente.setVisible(true);
+			buttonAnterior.setVisible(true);
+		}
+			
+		
+		
+		
+		
+	}
+
+	@SuppressWarnings("unused")
 	private Object[] getModelo(JList<Marca> listaMarca2) {
 		Marca marca = (Marca) listaMarca2.getSelectedValue();
 		ArrayList<Modelo> modelos = new ArrayList<Modelo>();
@@ -232,8 +246,13 @@ public class MostrarConcesionario extends JDialog {
 
 
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void establecerModelos() {
 		listaModelo.setModel(new AbstractListModel() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
 			ArrayList<Modelo> values = Modelo
 					.getModelosMarca((Marca) listaMarca.getSelectedValue());
 
@@ -294,6 +313,12 @@ public class MostrarConcesionario extends JDialog {
 		listaMarca.setSelectedValue(coche.getModelo().getMarca(), false);
 		listaModelo.setSelectedValue(coche.getModelo(), false);
 
+	}
+	private void empezar(){
+		if(concesionario.size()==0)
+			return;
+		indiceCoche=0;
+		mostrarCoche(concesionario.get(indiceCoche));
 	}
 
 }

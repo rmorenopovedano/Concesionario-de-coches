@@ -2,6 +2,11 @@ package pgn.examenMarzo.concesionarioCoches;
 
 public class ColorNoValidoException extends Exception {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public ColorNoValidoException() {
 		// TODO Auto-generated constructor stub
 	}

@@ -26,12 +26,17 @@ import javax.swing.border.EtchedBorder;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
+
+
+
+
+
 
 import javax.swing.AbstractListModel;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
 
+import pgn.examenMarzo.concesionarioCoches.Coche;
 import pgn.examenMarzo.concesionarioCoches.CocheYaExisteException;
 import pgn.examenMarzo.concesionarioCoches.ColorNoValidoException;
 import pgn.examenMarzo.concesionarioCoches.Concesionario;
@@ -40,15 +45,23 @@ import pgn.examenMarzo.concesionarioCoches.MatriculaNoValidaException;
 import pgn.examenMarzo.concesionarioCoches.Modelo;
 import pgn.examenMarzo.concesionarioCoches.ModeloNoValidoException;
 
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
+import javax.swing.ImageIcon;
+
 public class Alta extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField text_matricula;
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JRadioButton plataButton;
 	private JRadioButton rojoButton;
 	private JRadioButton azulButton;
-	private JList listaModelo;
+	private JList<Modelo> listaModelo;
 	private JList listaMarca;
 	private Concesionario concesionario;
 
@@ -60,8 +73,10 @@ public class Alta extends JDialog {
 	 * Create the dialog.
 	 * @param frame 
 	 */
+	@SuppressWarnings("unchecked")
 	public Alta(Concesionario concesionario2, JFrame frame) {
 		super(frame);
+		setResizable(false);
 		concesionario = concesionario2;
 		setTitle("Alta");
 		setModal(true);
@@ -80,6 +95,22 @@ public class Alta extends JDialog {
 		}
 
 		text_matricula = new JTextField();
+		text_matricula.addFocusListener(new FocusAdapter() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				text_matricula.setForeground(Color.BLACK);
+			}
+			@Override
+			public void focusLost(FocusEvent e) {
+				if(!Coche.esValida(text_matricula.getText())){
+					text_matricula.setForeground(Color.RED);
+				}					
+				else{
+					text_matricula.setForeground(Color.BLACK);
+				}
+					
+			}
+		});
 		text_matricula.setBounds(114, 18, 120, 20);
 		contentPanel.add(text_matricula);
 		text_matricula.setColumns(10);
@@ -104,7 +135,11 @@ public class Alta extends JDialog {
 				establecerModelos();
 			}
 		});
-		listaMarca.setModel(new AbstractListModel() {
+		listaMarca.setModel(new AbstractListModel<Object>() {
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
 			Marca[] values = Marca.values();
 
 			public int getSize() {
@@ -174,34 +209,25 @@ public class Alta extends JDialog {
 									"Error", JOptionPane.ERROR_MESSAGE);
 						}
 						text_matricula.setForeground(Color.BLACK);
+						text_matricula.setText(null);
 					}
+					
 				});
 				Crear.setActionCommand("OK");
 				buttonPane.add(Crear);
 				getRootPane().setDefaultButton(Crear);
 			}
 			{
-				JButton CANCELAR = new JButton("CANCELAR");
-				CANCELAR.addActionListener(new ActionListener() {
+				JButton cancelarButton = new JButton("CANCELAR");
+				cancelarButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setVisible(false);
-
 					}
 				});
-				CANCELAR.setActionCommand("Cancel");
-				buttonPane.add(CANCELAR);
+				cancelarButton.setActionCommand("Cancel");
+				buttonPane.add(cancelarButton);
 			}
 		}
-	}
-
-	private Object[] getModelo(JList<Marca> listaMarca2) {
-		Marca marca = (Marca) listaMarca2.getSelectedValue();
-		ArrayList<Modelo> modelos = new ArrayList<Modelo>();
-		for (Modelo m : Modelo.values()) {
-			if (m.getMarca() == marca)
-				modelos.add(m);
-		}
-		return modelos.toArray();
 	}
 
 	public pgn.examenMarzo.concesionarioCoches.Color getColor() {
@@ -213,6 +239,7 @@ public class Alta extends JDialog {
 			return pgn.examenMarzo.concesionarioCoches.Color.AZUL;
 	}
 
+	@SuppressWarnings({ "rawtypes", "serial", "unchecked" })
 	private void establecerModelos() {
 		listaModelo.setModel(new AbstractListModel() {
 			ArrayList<Modelo> values = Modelo

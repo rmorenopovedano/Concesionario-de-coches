@@ -19,39 +19,21 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.JList;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-import javax.swing.border.TitledBorder;
-import javax.swing.border.EtchedBorder;
-
 import java.awt.Color;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.AbstractListModel;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
-
 import pgn.examenMarzo.concesionarioCoches.Coche;
 import pgn.examenMarzo.concesionarioCoches.CocheNoExisteException;
 import pgn.examenMarzo.concesionarioCoches.Concesionario;
 import pgn.examenMarzo.concesionarioCoches.MatriculaNoValidaException;
-import pgn.examenMarzo.utiles.Teclado;
-
 import javax.swing.JTextArea;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-
-import javax.swing.event.AncestorListener;
-import javax.swing.event.AncestorEvent;
-import java.awt.Component;
 
 public class MostrarCoche extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
-	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private static Concesionario concesionario;
 	private JButton mostrar;
 	private JTextField campoMatricula;
@@ -69,6 +51,7 @@ public class MostrarCoche extends JDialog {
 	 */
 	public MostrarCoche(Concesionario concesionario2, JFrame frame) {
 		super(frame);
+		setResizable(false);
 		concesionario = concesionario2;
 		setTitle("Mostrar Coche por Matr\u00EDcula");
 		setModal(true);

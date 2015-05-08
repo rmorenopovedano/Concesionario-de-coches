@@ -9,25 +9,40 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 
-public class Fichero {
-	
-	public static void guardar(File file,
-			Concesionario concesionario2) throws IOException {
+public class Fichero implements Serializable {
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+    public static File fichero = new File("Sin-titulo.obj");
 
-//		File file = new File(nombreFichero2);
-		try (ObjectOutputStream out = new ObjectOutputStream(
-				new BufferedOutputStream(new FileOutputStream(file)))) {
-			out.writeObject(concesionario2);
-		}
 
-	}
-	public static Concesionario abrir(File file) throws FileNotFoundException, IOException, ClassNotFoundException{
-//		File file = new File(nombreFichero2);
-		try (ObjectInputStream in = new ObjectInputStream(
-				new BufferedInputStream(new FileInputStream(file)))) {
-			return (Concesionario)in.readObject();
-		}
+    public static void guardar(File file, Concesionario concesionario)
+                    throws IOException {
+            file = annadirExtension(file);
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+                            new BufferedOutputStream(new FileOutputStream(file, false)))) {
+                    objectOutputStream.writeObject(concesionario);
+            }
+    }
 
-	}
+    public static Object abrir(File archivo) throws FileNotFoundException,
+                    IOException, ClassNotFoundException {
+            archivo = annadirExtension(archivo);
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(
+                            archivo))) {
+                    return (Object) ois.readObject();
+            }
+    }
+
+    public static File annadirExtension(File archivo) {
+            String extension = archivo.getPath();
+            if (!extension.endsWith(".obj"))
+                    return new File(archivo + ".obj");
+            return archivo;
+    }
+
+   
 }

@@ -1,15 +1,13 @@
 package interfazGraficaConcesionario;
 
-import java.awt.BorderLayout;
+
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.JEditorPane;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -22,10 +20,16 @@ public class Ayuda extends JDialog {
 
 
 	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Create the dialog.
 	 */
 	public Ayuda(JFrame frame) {
 		super(frame);
+		setResizable(false);
 		setTitle("Ayuda");
 		setBounds(100, 100, 450, 300);
 		setLocationRelativeTo(frame);
@@ -36,14 +40,14 @@ public class Ayuda extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane);
 			{
-				JButton cancelButton = new JButton("CANCELAR");
-				cancelButton.addActionListener(new ActionListener() {
+				JButton volverButton = new JButton("VOLVER");
+				volverButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setVisible(false);
 					}
 				});
-				cancelButton.setActionCommand("Cancel");
-				buttonPane.add(cancelButton);
+				volverButton.setActionCommand("Cancel");
+				buttonPane.add(volverButton);
 			}
 		}
 		

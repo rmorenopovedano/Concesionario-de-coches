@@ -28,6 +28,10 @@ import java.util.ArrayList;
 
 public class MostrarPorColor extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private final ButtonGroup buttonGroup = new ButtonGroup();
 	private JRadioButton buttonPlata;
@@ -44,6 +48,7 @@ public class MostrarPorColor extends JDialog {
 	 */
 	public MostrarPorColor(Concesionario concesionario2, JFrame frame) {
 		super(frame);
+		setResizable(false);
 		concesionario=concesionario2;
 		setTitle("Elegir Color");
 		setBounds(100, 100, 450, 300);

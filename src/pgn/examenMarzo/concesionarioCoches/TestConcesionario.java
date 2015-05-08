@@ -70,12 +70,27 @@ public class TestConcesionario extends Concesionario {
 	 * Clase est&aacute;tica que crea un concesionario de coches
 	 */
 	static Concesionario concesionario = new Concesionario();
+	/**
+	 * Indica si el concesionario se ha modificado.
+	 */
+	private static boolean modificado;
+	/**
+	 * Nombre del fichero abierto.
+	 */
+	private static String nombreFichero;
+	/**
+	 * Menu que gestiona la opcion de guardar el fichero.
+	 */
+	private static Menu menuGuardar = new Menu("***Guardar fichero***",
+			new String[] { "Guardar fichero", "No guardar fichero",
+					"Crear nuevo sin guardar" });
 
 	/**
 	 * M&eacute;todo main
 	 * 
 	 * @param args
 	 */
+
 	public static void main(String[] args) {
 		do {
 			switch (menu.gestionar()) {
@@ -108,6 +123,16 @@ public class TestConcesionario extends Concesionario {
 				}
 				break;
 			default:// Salir
+				Menu menu = new Menu("Desea guardar el archivo antes de salir?",
+						new String[] { "Sí", "No" });
+				switch (menu.gestionar()) {
+				case 1:
+					guardar();
+					break;
+				case 2:
+					break;
+				}
+
 				System.out.println("Aaaaaaaaaaaaaaaaaaaaadios");
 				return;
 			}
@@ -118,11 +143,13 @@ public class TestConcesionario extends Concesionario {
 			throws FileNotFoundException, IOException {
 		switch (opcion) {
 		case 1:// nuevo archivo
-			concesionario.nuevo();
+			nuevo();
+
 			break;
 		case 2: // abrir archivo
 			try {
-				concesionario.abrir();
+				concesionario = (Concesionario) Fichero.abrir(Teclado
+						.leerCadena("Qué fichero quieres abrir?: "));
 			} catch (ClassNotFoundException e1) {
 				System.out.println(e1.getMessage());
 			} catch (IOException e1) {
@@ -130,41 +157,84 @@ public class TestConcesionario extends Concesionario {
 			}
 			break;
 		case 3: // guardar archivo
-			try {
-				concesionario.guardar("Con qué nombre guardas tu archivo?: ");
-			} catch (IOException e) {
-				System.out.println(e.getMessage());
-			}
+			guardar();
 			break;
 		case 4: // guardar como...
-			try {
-				concesionario.guardarComo();
-			} catch (Exception e) {
-				System.out.println(e.getMessage());
-			} finally {
-				char caracter;
-				do {
-					caracter = Teclado
-							.leerCaracter("Desea sobreescribir?(s/n)");
-				} while (caracter != 's' && caracter != 'n');
-				if (caracter == 's')
-					try {
-						concesionario
-								.guardar("Con qué nombre guardas tu archivo?: ");
-					} catch (IOException e1) {
-						System.out.println(e1.getMessage());
-					}
-				else {
-					String fichero = Teclado.leerCadena("nombre del archivo: ");
-					try (ObjectOutputStream out = new ObjectOutputStream(
-							new FileOutputStream(fichero))) {
-						out.writeObject(concesionario);
-
-					}
-
-				}
-			}
+			guardarComo();
+			break;
 		}
+		// char caracter;
+		// {
+
+		// do {
+		// caracter = Teclado
+		// .leerCaracter("Desea sobreescribir?(s/n)");
+		// } while (caracter != 's' && caracter != 'n');
+		// if (caracter == 's')
+		// try {
+		// Fichero.guardar(Teclado.leerCadena(
+		// "Con qué nombre guardas tu archivo?: "),
+		// concesionario);
+		// } catch (IOException e1) {
+		// System.out.println(e1.getMessage());
+		// }
+		// else {
+		// String fichero = Teclado
+		// .leerCadena("nombre del archivo: ");
+		// try (ObjectOutputStream out = new ObjectOutputStream(
+		// new FileOutputStream(fichero))) {
+		// out.writeObject(concesionario);
+		//
+		// }
+		//
+		// }
+		// }
+		// }
+		// }
+	}
+
+	private static boolean existe(String nombreFichero) {
+		File file = new File(nombreFichero);
+		return file.exists();
+	}
+
+	private static void nuevo() {
+
+		guardarSiModificado();
+		concesionario = new Concesionario();
+	}
+
+	private static void guardarSiModificado() {
+		if (getModificado()) {
+			System.out
+					.println("Desea guardar los cambios realizados al concesionario?: "
+							+ getNombreFichero());
+			switch (menuGuardar.gestionar()) {
+			case 1: // case ;//sí deseo guardar
+				if (getNombreFichero() == null) {
+					guardar();
+					System.out.println("Guardado correctamente.");
+				}
+				break;
+			case 2:// case ;//no deseo guardar
+				break;
+			default:// creo el nuevo sin guardar el anterior
+				return;
+
+			}
+
+		}
+		concesionario = new Concesionario();
+
+	}
+
+	private static boolean getModificado() {
+
+		return modificado;
+	}
+
+	private static String getNombreFichero() {
+		return nombreFichero;
 	}
 
 	/**
@@ -188,8 +258,11 @@ public class TestConcesionario extends Concesionario {
 	private static void eliminarCoche() {
 		try {
 			if (concesionario.eliminar(Teclado
-					.leerCadena("Introduce la matrícula")))
+					.leerCadena("Introduce la matrícula"))) {
 				System.out.println("Coche eliminado");
+				setModificado(true);
+			}
+
 			else
 				System.out.println("No se ha podido eliminar");
 		} catch (MatriculaNoValidaException e) {
@@ -211,10 +284,16 @@ public class TestConcesionario extends Concesionario {
 			concesionario.annadir(Teclado.leerCadena("Introduce la matrícula"),
 					pedirColor(), pedirModelo());
 			System.out.println("Coche añadido con éxito");
+			setModificado(true);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 
 		}
+
+	}
+
+	private static void setModificado(boolean b) {
+		modificado = b;
 
 	}
 
@@ -248,4 +327,44 @@ public class TestConcesionario extends Concesionario {
 		return arrColores[opcion - 1];
 	}
 
+	static void guardar() {
+		if (nombreFichero == null)
+			guardarComo();
+		else
+			almacenar();
+	}
+
+	private static void guardarComo() {
+		nombreFichero = Teclado.leerCadena("Dime el nombre del fichero: ");
+		if (sobreescribir())
+			almacenar();
+		else
+			System.out.println("No se ha guardado el archivo");
+
+	}
+
+	private static void almacenar() {
+		try {
+			Fichero.guardar(nombreFichero, concesionario);
+			setModificado(false);
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+
+	private static boolean sobreescribir() {
+		if (existe(nombreFichero)) {
+			Menu menu = new Menu("Desea sobreescribir?", new String[] { "Sí",
+					"No" });
+			switch (menu.gestionar()) {
+			case 1:
+
+				return true;
+			case 2:
+
+				return false;
+			}
+		}
+		return true;
+	}
 }

@@ -7,7 +7,6 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.UIManager;
 import java.awt.event.ActionListener;
@@ -18,6 +17,10 @@ import java.awt.Color;
 
 public class AboutConcesionario extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 
 	/**
@@ -29,6 +32,7 @@ public class AboutConcesionario extends JDialog {
 	 */
 	public AboutConcesionario(JFrame frame) {
 		super(frame);
+		setResizable(false);
 		setTitle("Sobre el concesionario");
 		setBounds(100, 100, 450, 300);
 		setLocationRelativeTo(frame);
@@ -50,14 +54,14 @@ public class AboutConcesionario extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton cancelar = new JButton("CANCELAR");
-				cancelar.addActionListener(new ActionListener() {
+				JButton volverButton = new JButton("VOLVER");
+				volverButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						setVisible(false);
 					}
 				});
-				cancelar.setActionCommand("Cancel");
-				buttonPane.add(cancelar);
+				volverButton.setActionCommand("Cancel");
+				buttonPane.add(volverButton);
 			}
 		}
 	}
